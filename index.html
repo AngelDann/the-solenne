@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>THE SOLENNE | Brickell Bay · Miami</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app-viewport state-tower">
+    
+    <!-- TOP NAVIGATION BAR (Persistent across all views) -->
+    <header class="top-nav">
+      <div class="brand" id="navBrand" title="Return to Tower View">
+        <span class="brand-monogram">S</span>
+        <span class="brand-name">THE SOLENNE</span>
+        <span class="brand-divider">|</span>
+        <span class="brand-location">BRICKELL BAY · MIAMI</span>
+      </div>
+      <nav class="nav-links">
+        <button class="nav-link" data-action="jump-residence">RESIDENCES</button>
+        <button class="nav-link" data-action="jump-penthouse">PENTHOUSES</button>
+        <button class="nav-link" data-action="jump-amenities">AMENITIES</button>
+        <button class="btn-private-tour" id="btnPrivateTour">PRIVATE TOUR</button>
+      </nav>
+    </header>
+
+    <!-- ===================================================================
+         VIEW 1 & 2: EXTERIOR TOWER + ARCHITECTURAL SPLIT CUTAWAY TRANSITION
+         =================================================================== -->
+    <section id="towerStage" class="stage tower-stage active">
+      <!-- Deep dark backdrop revealed when the building splits apart -->
+      <div class="split-cavity-backdrop">
+        <!-- Inside the horizontal split of the building, a glowing architectural cross-section appears -->
+        <div class="split-cavity-interior" id="splitCavityInterior">
+          <div class="cavity-slab-top"></div>
+          <div class="cavity-room-preview" id="cavityRoomPreview"></div>
+          <div class="cavity-slab-bottom"></div>
+        </div>
+      </div>
+
+      <!-- Camera zoom wrapper -->
+      <div class="tower-camera" id="towerCamera">
+        <!-- Upper half of building (slides UP when splitting) -->
+        <div class="tower-slice tower-slice-top" id="towerSliceTop">
+          <img src="public/assets/tower-exterior.png" alt="The Solenne Tower Upper" class="tower-img" draggable="false" />
+          <div class="slice-slab-edge-bottom"></div>
+        </div>
+
+        <!-- Lower half of building (slides DOWN when splitting) -->
+        <div class="tower-slice tower-slice-bottom" id="towerSliceBottom">
+          <img src="public/assets/tower-exterior.png" alt="The Solenne Tower Lower" class="tower-img" draggable="false" />
+          <div class="slice-slab-edge-top"></div>
+        </div>
+
+        <!-- Interactive Floor Hover Layer (aligned over the tower) -->
+        <div class="tower-interactive-overlay" id="towerOverlay">
+          <!-- Floor highlight box -->
+          <div class="floor-highlight-band" id="floorHighlightBand">
+            <div class="floor-window-glow"></div>
+          </div>
+
+          <!-- Horizontal connector line + Floating Floor Tooltip Card -->
+          <div class="floor-tooltip-wrapper" id="floorTooltipWrapper">
+            <div class="floor-leader-line"></div>
+            <div class="floor-tooltip-card" id="floorTooltipCard">
+              <div class="tooltip-floor-col">
+                <span class="tooltip-eyebrow">FLOOR</span>
+                <div class="floor-Slot-window">
+                  <div class="floor-number-track" id="floorNumberTrack">
+                    <span class="floor-num-current" id="floorNumCurrent">19</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tooltip-info-col">
+                <h3 class="tooltip-unit-name" id="tooltipUnitName">Residence A</h3>
+                <p class="tooltip-unit-specs" id="tooltipUnitSpecs">2 Bed · 2 Bath · 1,450 SF</p>
+                <div class="tooltip-availability-badge" id="tooltipAvailability">
+                  AVAILABLE · FROM $1.56M
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Invisible hit-target strips for floors 5 to 33 -->
+          <div class="floor-hit-zones" id="floorHitZones"></div>
+        </div>
+      </div>
+
+      <!-- Bottom-left helper prompt & quick floor jumpers -->
+      <div class="tower-bottom-left">
+        <div class="explore-prompt">
+          <span class="pulse-dot"></span>
+          <span>HOVER A FLOOR TO EXPLORE · CLICK TO ENTER</span>
+        </div>
+        <div class="quick-floor-pills">
+          <button class="quick-pill" data-floor="19">Floor 19 · Residence A</button>
+          <button class="quick-pill" data-floor="33">Floor 33 · Sky Penthouse</button>
+        </div>
+      </div>
+
+      <!-- Bottom-right attribution matching the video -->
+      <div class="tower-bottom-right">
+        Concept demo by Level Up Media. The Solenne is fictional; all imagery is AI-generated.
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         VIEW 3: 3D ISOMETRIC DOLLHOUSE FLOOR PLAN VIEW
+         =================================================================== -->
+    <section id="dollhouseStage" class="stage dollhouse-stage">
+      <div class="dollhouse-layout">
+        
+        <!-- Left/Center 3D Cutaway Floor Plan Canvas -->
+        <div class="dollhouse-visual-area" id="dollhouseVisualArea">
+          <div class="dollhouse-model-wrapper" id="dollhouseModelWrapper">
+            <img id="dollhouseImage" src="public/assets/res-a-dollhouse.png" alt="3D Floor Plan" class="dollhouse-img" draggable="false" />
+            <!-- Interactive Room Pins on the 3D Dollhouse -->
+            <div class="dollhouse-hotspots" id="dollhouseHotspots"></div>
+          </div>
+        </div>
+
+        <!-- Right Specification Sidebar Card -->
+        <aside class="residence-details-card" id="residenceDetailsCard">
+          <div class="card-eyebrow" id="cardEyebrow">FLOOR 19 · AVAILABLE</div>
+          <h1 class="card-title" id="cardTitle">Residence A</h1>
+
+          <div class="card-stats-grid">
+            <div class="stat-cell">
+              <span class="stat-value" id="statBeds">2</span>
+              <span class="stat-label">BEDROOMS</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-value" id="statBaths">2</span>
+              <span class="stat-label">BATHS</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-value" id="statSqft">1,450</span>
+              <span class="stat-label">SQ FT</span>
+            </div>
+          </div>
+
+          <div class="card-price-row">
+            <span class="price-prefix">FROM</span>
+            <span class="price-amount" id="cardPrice">$1.56M</span>
+          </div>
+
+          <p class="card-description" id="cardDescription">
+            A bay-facing two-bedroom with a full wall of glass, an open chef's kitchen and a primary suite with a spa bath and walk-in closet. Plus 120 SF balcony.
+          </p>
+
+          <!-- Interactive Room Navigation List -->
+          <ul class="card-room-list" id="cardRoomList"></ul>
+
+          <div class="card-actions">
+            <button class="btn-outline-dark" id="btnBackToTower">BACK TO TOWER</button>
+            <button class="btn-gold-solid" id="btnRequestPlan">REQUEST FLOOR PLAN</button>
+          </div>
+        </aside>
+
+      </div>
+
+      <div class="tower-bottom-right">
+        Concept demo by Level Up Media. The Solenne is fictional; all imagery is AI-generated.
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         VIEW 4: INTERIOR ROOM FIRST-PERSON SHOWCASE
+         =================================================================== -->
+    <section id="roomStage" class="stage room-stage">
+      <!-- Dual-layer image crossfader for smooth room-to-room transitions -->
+      <div class="room-Pan-wrapper" id="roomPanWrapper">
+        <img id="roomImagePrimary" src="public/assets/res-a-living.png" alt="Interior Room" class="room-photo active" draggable="false" />
+        <img id="roomImageSecondary" src="public/assets/res-a-living.png" alt="Interior Room Next" class="room-photo" draggable="false" />
+      </div>
+
+      <div class="room-bottom-gradient"></div>
+
+      <!-- Bottom-left Back Button & Room Title -->
+      <div class="room-bottom-left">
+        <button class="btn-back-floorplan" id="btnBackToFloorPlan">
+          <span class="arrow-left">←</span> BACK TO FLOOR PLAN
+        </button>
+        <div class="room-meta-eyebrow" id="roomMetaEyebrow">FLOOR 19 · RESIDENCE A</div>
+        <h2 class="room-Display-title" id="roomDisplayTitle">Living &amp; Kitchen</h2>
+      </div>
+
+      <!-- Bottom-right Room Switcher Tabs -->
+      <div class="room-switcher-bar" id="roomSwitcherBar"></div>
+    </section>
+
+    <!-- ===================================================================
+         MODAL: PRIVATE TOUR / REQUEST FLOOR PLAN
+         =================================================================== -->
+    <div class="luxury-modal-backdrop" id="inquiryModal">
+      <div class="luxury-modal">
+        <button class="modal-close" id="btnCloseModal" aria-label="Close">&times;</button>
+        <div class="modal-eyebrow" id="modalEyebrow">THE SOLENNE · BRICKELL BAY</div>
+        <h2 class="modal-title" id="modalTitle">Schedule a Private Presentation</h2>
+        <p class="modal-subtitle" id="modalSubtitle">
+          Enter your details below to receive the private architectural dossier and floor plan package.
+        </p>
+        <form id="inquiryForm" class="modal-form">
+          <div class="form-row">
+            <input type="text" placeholder="Full Name" required class="luxury-input" />
+          </div>
+          <div class="form-row">
+            <input type="email" placeholder="Email Address" required class="luxury-input" />
+          </div>
+          <div class="form-row">
+            <input type="tel" placeholder="Phone Number" class="luxury-input" />
+          </div>
+          <button type="submit" class="btn-gold-solid modal-submit">REQUEST PRIVATE DOSSIER</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
