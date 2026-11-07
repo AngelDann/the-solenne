@@ -232,11 +232,46 @@ function getFormattedPrice(band) {
 }
 
 /**
+ * Converts 16:9 image-space percentages into exact viewport percentages
+ * accounting for CSS object-fit: cover on any screen aspect ratio (mobile portrait, tablet, ultrawide).
+ */
+function getTowerBandViewportRect(band) {
+  const vw = window.innerWidth || 1440;
+  const vh = window.innerHeight || 810;
+  const imgAspect = 16 / 9;
+  const vpAspect = vw / vh;
+
+  let renderW, renderH, offsetX, offsetY;
+  if (vpAspect < imgAspect) {
+    renderH = vh;
+    renderW = vh * imgAspect;
+    offsetX = (vw - renderW) / 2;
+    offsetY = 0;
+  } else {
+    renderW = vw;
+    renderH = vw / imgAspect;
+    offsetX = 0;
+    offsetY = (vh - renderH) / 2;
+  }
+
+  const left = ((offsetX + (band.left / 100) * renderW) / vw) * 100;
+  const width = (((band.width / 100) * renderW) / vw) * 100;
+  const top = ((offsetY + (band.top / 100) * renderH) / vh) * 100;
+  const height = (((band.height / 100) * renderH) / vh) * 100;
+
+  return {
+    left: Math.max(2, left),
+    width: Math.min(96, width),
+    top,
+    height
+  };
+}
+
+/**
  * Build interactive hit strips for each floor band on the tower
  */
 function initTowerFloorSelector() {
   floorHitZones.innerHTML = '';
-  // Position hit-zones container to span the full viewport so each band uses exact % coordinates
   floorHitZones.style.left = '0';
   floorHitZones.style.top = '0';
   floorHitZones.style.width = '100%';
@@ -247,10 +282,6 @@ function initTowerFloorSelector() {
     const strip = document.createElement('div');
     strip.className = 'floor-hit-strip';
     strip.style.position = 'absolute';
-    strip.style.left = `${band.left}%`;
-    strip.style.width = `${band.width}%`;
-    strip.style.top = `${band.top}%`;
-    strip.style.height = `${band.height}%`;
     strip.dataset.floor = band.floor;
 
     strip.addEventListener('mouseenter', () => {
@@ -260,6 +291,11 @@ function initTowerFloorSelector() {
 
     strip.addEventListener('click', () => {
       if (state.view !== 'tower') return;
+      const isMobile = window.innerWidth <= 900;
+      if (isMobile && (!state.activeFloorBand || state.activeFloorBand.floor !== band.floor)) {
+        selectFloorBand(band);
+        return;
+      }
       selectFloorBand(band);
       enterFloorCutaway(band);
     });
@@ -267,12 +303,63 @@ function initTowerFloorSelector() {
     floorHitZones.appendChild(strip);
   });
 
-  // Set initial floor (Floor 19)
+  // Touch scrubbing across floors on mobile/tablet
+  floorHitZones.addEventListener(
+    'touchmove',
+    (e) => {
+      if (state.view !== 'tower' || !e.touches[0]) return;
+      const touch = e.touches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (el && el.classList.contains('floor-hit-strip')) {
+        const floorNum = parseInt(el.dataset.floor, 10);
+        const band = FLOOR_BANDS.find((b) => b.floor === floorNum);
+        if (band && (!state.activeFloorBand || state.activeFloorBand.floor !== floorNum)) {
+          selectFloorBand(band);
+        }
+      }
+    },
+    { passive: true }
+  );
+
+  // Clicking the floating tooltip card also enters the selected floor (essential on mobile)
+  const tooltipCard = document.getElementById('floorTooltipCard');
+  if (tooltipCard) {
+    tooltipCard.style.pointerEvents = 'auto';
+    tooltipCard.style.cursor = 'pointer';
+    tooltipCard.addEventListener('click', () => {
+      if (state.view === 'tower' && state.activeFloorBand) {
+        enterFloorCutaway(state.activeFloorBand);
+      }
+    });
+  }
+
+  layoutTowerHitZones();
   selectFloorBand(state.activeFloorBand, true);
+
+  window.addEventListener('resize', () => {
+    layoutTowerHitZones();
+    if (state.activeFloorBand) {
+      selectFloorBand(state.activeFloorBand, true);
+    }
+  });
+}
+
+function layoutTowerHitZones() {
+  const strips = floorHitZones.querySelectorAll('.floor-hit-strip');
+  strips.forEach((strip) => {
+    const floorNum = parseInt(strip.dataset.floor, 10);
+    const band = FLOOR_BANDS.find((b) => b.floor === floorNum);
+    if (!band) return;
+    const rect = getTowerBandViewportRect(band);
+    strip.style.left = `${rect.left}%`;
+    strip.style.width = `${rect.width}%`;
+    strip.style.top = `${rect.top}%`;
+    strip.style.height = `${rect.height}%`;
+  });
 }
 
 /**
- * Updates the floor highlight box and floating tooltip card when hovering floors
+ * Updates the floor highlight box and floating tooltip card when hovering/scrubbing floors
  */
 function selectFloorBand(band, immediate = false) {
   const prevFloor = state.activeFloorBand ? state.activeFloorBand.floor : band.floor;
@@ -280,16 +367,24 @@ function selectFloorBand(band, immediate = false) {
   const unit = RESIDENCE_CATALOG[band.type];
   state.activeResidence = unit;
 
-  // Move floor highlight box
-  floorHighlightBand.style.left = `${band.left}%`;
-  floorHighlightBand.style.width = `${band.width}%`;
-  floorHighlightBand.style.top = `${band.top}%`;
-  floorHighlightBand.style.height = `${band.height}%`;
+  const rect = getTowerBandViewportRect(band);
+  const isMobile = window.innerWidth <= 900;
 
-  // Move tooltip card & leader line
-  const centerY = band.top + band.height / 2;
-  floorTooltipWrapper.style.left = `${band.left + band.width}%`;
-  floorTooltipWrapper.style.top = `${centerY}%`;
+  // Move floor highlight box
+  floorHighlightBand.style.left = `${rect.left}%`;
+  floorHighlightBand.style.width = `${rect.width}%`;
+  floorHighlightBand.style.top = `${rect.top}%`;
+  floorHighlightBand.style.height = `${rect.height}%`;
+
+  // Move tooltip card & leader line (docked cleanly on mobile, side-floating on desktop)
+  const centerY = rect.top + rect.height / 2;
+  if (isMobile) {
+    floorTooltipWrapper.style.left = '50%';
+    floorTooltipWrapper.style.top = 'auto';
+  } else {
+    floorTooltipWrapper.style.left = `${rect.left + rect.width}%`;
+    floorTooltipWrapper.style.top = `${centerY}%`;
+  }
 
   // Animate vertical rolling floor number
   if (!immediate && prevFloor !== band.floor) {
@@ -308,7 +403,9 @@ function selectFloorBand(band, immediate = false) {
   const priceStr = getFormattedPrice(band);
   tooltipUnitName.textContent = unit.name;
   tooltipUnitSpecs.textContent = unit.specsLine;
-  tooltipAvailability.textContent = `${unit.status} · FROM ${priceStr}`;
+  tooltipAvailability.textContent = isMobile
+    ? `${unit.status} · ${priceStr} · TAP TO ENTER →`
+    : `${unit.status} · FROM ${priceStr}`;
 }
 
 /**
@@ -595,6 +692,30 @@ function initMouseParallax() {
       roomPanWrapper.style.transform = `translate3d(${-nx * 14}px, ${-ny * 10}px, 0)`;
     }
   });
+
+  // Mobile touch panning for Room View
+  let touchStartX = 0;
+  let currentPanX = 0;
+  roomStage.addEventListener(
+    'touchstart',
+    (e) => {
+      if (state.view !== 'room' || !e.touches[0]) return;
+      touchStartX = e.touches[0].clientX;
+    },
+    { passive: true }
+  );
+
+  roomStage.addEventListener(
+    'touchmove',
+    (e) => {
+      if (state.view !== 'room' || !e.touches[0]) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      touchStartX = e.touches[0].clientX;
+      currentPanX = Math.max(-45, Math.min(45, currentPanX + dx * 0.25));
+      roomPanWrapper.style.transform = `translate3d(${currentPanX}px, 0, 0)`;
+    },
+    { passive: true }
+  );
 }
 
 /**

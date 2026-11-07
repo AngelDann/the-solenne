@@ -1196,3 +1196,321 @@ html, body {
   margin-top: 8px;
   padding: 15px;
 }
+
+/* ==========================================================================
+   RESPONSIVE DESIGN — TABLET & MOBILE (<= 900px and <= 480px)
+   ========================================================================== */
+@supports (height: 100dvh) {
+  .app-viewport {
+    height: 100dvh;
+  }
+}
+
+.three-canvas-container canvas {
+  touch-action: none;
+}
+
+@media (max-width: 900px) {
+  /* Top Navigation Bar */
+  .top-nav {
+    height: 62px;
+    padding: 0 16px;
+    background: linear-gradient(180deg, rgba(6, 9, 15, 0.85) 0%, rgba(6, 9, 15, 0.45) 75%, transparent 100%);
+  }
+
+  .brand {
+    gap: 9px;
+  }
+
+  .brand-monogram {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .brand-name {
+    font-size: 13.5px;
+    letter-spacing: 0.18em;
+  }
+
+  .brand-divider,
+  .brand-location {
+    display: none;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+
+  .nav-link {
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+  }
+
+  .btn-private-tour {
+    padding: 7px 11px;
+    font-size: 8.5px;
+    letter-spacing: 0.14em;
+  }
+
+  /* Tower View Mobile Adjustments */
+  .floor-tooltip-wrapper {
+    left: 50% !important;
+    top: auto !important;
+    bottom: 108px;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 32px);
+    max-width: 380px;
+    justify-content: center;
+    pointer-events: auto;
+  }
+
+  .floor-leader-line {
+    display: none;
+  }
+
+  .floor-tooltip-card {
+    width: 100%;
+    min-width: 0;
+    padding: 12px 16px;
+    gap: 14px;
+    justify-content: flex-start;
+    background: rgba(8, 12, 19, 0.94);
+    border: 1px solid rgba(229, 212, 179, 0.48);
+  }
+
+  .floor-num-current {
+    font-size: 32px;
+  }
+
+  .tooltip-unit-name {
+    font-size: 19px;
+  }
+
+  .tooltip-unit-specs {
+    font-size: 10px;
+  }
+
+  .tooltip-availability-badge {
+    font-size: 8.5px;
+    padding: 4px 8px;
+    letter-spacing: 0.12em;
+  }
+
+  .tower-bottom-left {
+    left: 16px;
+    right: 16px;
+    bottom: 24px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .explore-prompt {
+    justify-content: center;
+    padding: 7px 12px;
+    font-size: 8.5px;
+    letter-spacing: 0.14em;
+  }
+
+  .quick-floor-pills {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .quick-pill {
+    text-align: center;
+    padding: 9px 8px;
+    font-size: 8.5px;
+  }
+
+  .tower-bottom-right {
+    display: none;
+  }
+
+  /* Dollhouse Stage — Stacked Vertical Split Layout on Mobile */
+  .dollhouse-layout {
+    padding: 62px 14px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+  }
+
+  .dollhouse-visual-area {
+    flex: 0 0 44%;
+    min-height: 240px;
+    width: 100%;
+  }
+
+  .view-mode-toggle {
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .mode-btn {
+    padding: 6px 10px;
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+  }
+
+  .dollhouse-model-wrapper {
+    max-width: 100%;
+    max-height: 38vh;
+  }
+
+  .dollhouse-img {
+    max-height: 36vh;
+  }
+
+  .three-hint-pill {
+    bottom: 8px;
+    padding: 5px 12px;
+    font-size: 7.5px;
+    letter-spacing: 0.12em;
+  }
+
+  .residence-details-card {
+    flex: 1 1 auto;
+    width: 100%;
+    padding: 15px 16px;
+    overflow-y: auto;
+    max-height: 52vh;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(229, 212, 179, 0.28) transparent;
+  }
+
+  .residence-details-card::-webkit-scrollbar,
+  .room-switcher-bar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .residence-details-card::-webkit-scrollbar-thumb,
+  .room-switcher-bar::-webkit-scrollbar-thumb {
+    background: rgba(229, 212, 179, 0.3);
+    border-radius: 2px;
+  }
+
+  .card-eyebrow {
+    font-size: 8.5px;
+    margin-bottom: 4px;
+  }
+
+  .card-title {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .card-stats-grid {
+    padding: 9px 0;
+    margin-bottom: 12px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 7.5px;
+  }
+
+  .card-price-row {
+    margin-bottom: 8px;
+  }
+
+  .price-amount {
+    font-size: 22px;
+  }
+
+  .card-description {
+    font-size: 11.5px;
+    line-height: 1.48;
+    margin-bottom: 12px;
+  }
+
+  .card-room-list {
+    margin-bottom: 14px;
+  }
+
+  .card-room-item {
+    padding: 9px 4px;
+    font-size: 11.5px;
+  }
+
+  .card-actions {
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .btn-outline-dark,
+  .btn-gold-solid {
+    padding: 11px 8px;
+    font-size: 8.5px;
+    letter-spacing: 0.13em;
+  }
+
+  /* Interior Room Stage on Mobile */
+  .room-bottom-gradient {
+    height: 46vh;
+    background: linear-gradient(180deg, transparent 0%, rgba(6, 9, 15, 0.72) 50%, rgba(6, 9, 15, 0.95) 100%);
+  }
+
+  .room-bottom-left {
+    left: 16px;
+    right: 16px;
+    bottom: 78px;
+  }
+
+  .btn-back-floorplan {
+    padding: 8px 12px;
+    font-size: 8.5px;
+    margin-bottom: 8px;
+  }
+
+  .room-meta-eyebrow {
+    font-size: 8.5px;
+  }
+
+  .room-Display-title {
+    font-size: 28px;
+  }
+
+  .room-switcher-bar {
+    left: 16px;
+    right: 16px;
+    bottom: 20px;
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .room-tab-btn {
+    flex: 1 0 auto;
+    padding: 10px 12px;
+    font-size: 8.5px;
+    letter-spacing: 0.13em;
+    text-align: center;
+  }
+
+  /* Modal on Mobile */
+  .luxury-modal {
+    margin: 0 16px;
+    padding: 28px 22px;
+  }
+
+  .modal-title {
+    font-size: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-links .nav-link {
+    display: none;
+  }
+}

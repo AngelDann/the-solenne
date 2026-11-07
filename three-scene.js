@@ -216,23 +216,35 @@ class ThreeSolenneApp {
     }
   }
 
+  fitCameraToViewport() {
+    if (!this.camera || !this.controls || !this.container) return;
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    const aspect = width / Math.max(height, 1);
+    // Pull camera back on portrait/narrow viewports so horizontal span fits
+    const zoomScale = aspect < 1.25 ? Math.min(1.85, 1.28 / Math.max(aspect, 0.45)) : 1.0;
+
+    if (this.currentUnit === 'sky-penthouse' || this.currentUnit === 'corner-penthouse') {
+      this.camera.position.set(0, 23 * zoomScale, 30 * zoomScale);
+      this.controls.target.set(0, 0.6, -0.5);
+    } else {
+      this.camera.position.set(-18.5 * zoomScale, 19.5 * zoomScale, 22 * zoomScale);
+      this.controls.target.set(0.5, 0.6, 0.5);
+    }
+    this.controls.maxDistance = 68;
+    this.controls.update();
+  }
+
   buildModel(unitId) {
     this.clearScene();
     this.currentUnit = unitId;
 
     if (unitId === 'sky-penthouse' || unitId === 'corner-penthouse') {
-      if (this.camera && this.controls) {
-        this.camera.position.set(0, 23, 30);
-        this.controls.target.set(0, 0.6, -0.5);
-      }
       this.buildSkyPenthouseModel();
     } else {
-      if (this.camera && this.controls) {
-        this.camera.position.set(-18.5, 19.5, 22);
-        this.controls.target.set(0.5, 0.6, 0.5);
-      }
       this.buildResidenceAModel();
     }
+    this.fitCameraToViewport();
   }
 
   // =========================================================================
@@ -1335,6 +1347,7 @@ class ThreeSolenneApp {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+    this.fitCameraToViewport();
   }
 
   animate() {
