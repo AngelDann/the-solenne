@@ -173,7 +173,8 @@ const state = {
   activeFloorBand: FLOOR_BANDS.find((b) => b.floor === 19),
   activeResidence: RESIDENCE_CATALOG['residence-a'],
   activeRoomIndex: 0,
-  primaryPhotoActive: true
+  primaryPhotoActive: true,
+  dollhouseMode: 'render' // 'render' | 'three'
 };
 
 // DOM Elements
@@ -344,6 +345,9 @@ function enterFloorCutaway(band) {
   setTimeout(() => {
     towerStage.classList.add('is-parting-out');
     dollhouseStage.classList.add('active');
+    if (state.dollhouseMode === 'three' && window.ThreeSolenne && window.ThreeSolenne.renderer) {
+      window.ThreeSolenne.onResize();
+    }
   }, 1250);
 
   setTimeout(() => {
@@ -373,6 +377,11 @@ function populateDollhouseStage(band, unit) {
   statSqft.textContent = unit.sqft;
   cardPrice.textContent = priceStr;
   cardDescription.textContent = unit.description;
+
+  // Sync Three.js model if in 3D mode or pre-initialize
+  if (window.ThreeSolenne && window.ThreeSolenne.renderer) {
+    window.ThreeSolenne.buildModel(unit.id);
+  }
 
   // Render interactive 3D floor plan pins
   dollhouseHotspots.innerHTML = '';
@@ -455,9 +464,37 @@ function enterRoomView(roomIndex) {
   }, 800);
 }
 
-/**
- * Updates bottom-left room metadata and title
- */
+// Expose globally for Three.js 3D raycaster
+window.enterRoomView = enterRoomView;
+
+function setDollhouseMode(mode) {
+  state.dollhouseMode = mode;
+  const is3D = mode === 'three';
+  const btnRender = document.getElementById('btnModeRender');
+  const btn3D = document.getElementById('btnMode3D');
+  if (btnRender) btnRender.classList.toggle('active', !is3D);
+  if (btn3D) btn3D.classList.toggle('active', is3D);
+
+  const renderWrapper = document.getElementById('dollhouseModelWrapper');
+  const threeWrapper = document.getElementById('threeDollhouseWrapper');
+
+  if (is3D) {
+    if (renderWrapper) renderWrapper.classList.add('hidden');
+    if (threeWrapper) threeWrapper.classList.add('active');
+    if (window.ThreeSolenne) {
+      if (!window.ThreeSolenne.renderer) {
+        window.ThreeSolenne.init('threeDollhouseContainer');
+      }
+      window.ThreeSolenne.buildModel(state.activeResidence.id);
+      setTimeout(() => {
+        window.ThreeSolenne.onResize();
+      }, 50);
+    }
+  } else {
+    if (renderWrapper) renderWrapper.classList.remove('hidden');
+    if (threeWrapper) threeWrapper.classList.remove('active');
+  }
+}
 function updateRoomOverlayText(band, unit, room) {
   roomMetaEyebrow.textContent = `FLOOR ${band.floor} · ${unit.name.toUpperCase()}`;
   roomDisplayTitle.textContent = room.title;
@@ -551,7 +588,9 @@ function initMouseParallax() {
     const ny = (e.clientY / window.innerHeight - 0.5) * 2;
 
     if (state.view === 'dollhouse') {
-      dollhouseModelWrapper.style.transform = `rotateY(${nx * 3.2}deg) rotateX(${-ny * 2.4}deg)`;
+      if (state.dollhouseMode !== 'three') {
+        dollhouseModelWrapper.style.transform = `rotateY(${nx * 3.2}deg) rotateX(${-ny * 2.4}deg)`;
+      }
     } else if (state.view === 'room') {
       roomPanWrapper.style.transform = `translate3d(${-nx * 14}px, ${-ny * 10}px, 0)`;
     }
@@ -565,6 +604,12 @@ function initControls() {
   document.getElementById('btnBackToTower').addEventListener('click', returnToTower);
   document.getElementById('btnBackToFloorPlan').addEventListener('click', returnToFloorPlan);
   document.getElementById('navBrand').addEventListener('click', returnToTower);
+
+  // 2D / 3D Mode Toggle
+  const btnRender = document.getElementById('btnModeRender');
+  const btn3D = document.getElementById('btnMode3D');
+  if (btnRender) btnRender.addEventListener('click', () => setDollhouseMode('render'));
+  if (btn3D) btn3D.addEventListener('click', () => setDollhouseMode('three'));
 
   // Quick floor pills at bottom-left of Tower View
   document.querySelectorAll('.quick-pill').forEach((pill) => {
@@ -646,4 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTowerFloorSelector();
   initControls();
   initMouseParallax();
+  if (window.ThreeAtmosphere) {
+    window.ThreeAtmosphere.init('roomThreeOverlay');
+  }
 });

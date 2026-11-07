@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+  <!-- Three.js 3D Engine & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
   <div id="app" class="app-viewport state-tower">
@@ -116,10 +119,27 @@
         
         <!-- Left/Center 3D Cutaway Floor Plan Canvas -->
         <div class="dollhouse-visual-area" id="dollhouseVisualArea">
+          <!-- 2D / 3D Mode Switcher -->
+          <div class="view-mode-toggle" id="viewModeToggle">
+            <button class="mode-btn active" id="btnModeRender">2D RENDER</button>
+            <button class="mode-btn" id="btnMode3D">
+              <span class="mode-icon">❖</span> 3D REALTIME (THREE.JS)
+            </button>
+          </div>
+
+          <!-- 2D Render Model Wrapper -->
           <div class="dollhouse-model-wrapper" id="dollhouseModelWrapper">
             <img id="dollhouseImage" src="public/assets/res-a-dollhouse.png" alt="3D Floor Plan" class="dollhouse-img" draggable="false" />
             <!-- Interactive Room Pins on the 3D Dollhouse -->
             <div class="dollhouse-hotspots" id="dollhouseHotspots"></div>
+          </div>
+
+          <!-- Real-Time WebGL Three.js Container -->
+          <div class="three-dollhouse-wrapper" id="threeDollhouseWrapper">
+            <div id="threeDollhouseContainer" class="three-canvas-container"></div>
+            <div class="three-hint-pill">
+              <span>DRAG TO ORBIT 360° · SCROLL TO ZOOM · CLICK ROOM MARKERS</span>
+            </div>
           </div>
         </div>
 
@@ -178,6 +198,9 @@
         <img id="roomImageSecondary" src="public/assets/res-a-living.png" alt="Interior Room Next" class="room-photo" draggable="false" />
       </div>
 
+      <!-- Three.js 3D Atmospheric Particle Overlay -->
+      <div id="roomThreeOverlay" class="room-three-overlay"></div>
+
       <div class="room-bottom-gradient"></div>
 
       <!-- Bottom-left Back Button & Room Title -->
@@ -221,6 +244,7 @@
 
   </div>
 
+  <script src="three-scene.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
